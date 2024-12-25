@@ -51,7 +51,7 @@ public void validateRequestUserId(String userId) {
 @Component
 public class RequestLoginIdValidationAspect {
 
-    @Before("@annotation(com.tsw.kns.global.annotation.RequestLoginIdValidation) && args(userId, ..)")
+    @Before("@annotation(xxx.xxx.RequestLoginIdValidation) && args(userId, ..)")
     public void beforeRequestLoginIdValidation(String userId) {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!principal.getUsername().equals(userId)) {
@@ -80,28 +80,13 @@ public ResponseEntity<FindUserResponse> findUserById(@PathVariable("userId") Str
     return ResponseEntity.ok(response);
 }
 ```
-어노테이션 하나가 추가되었을 뿐, 더이상 검증 로직이 비즈니스 로직과 함께 있지 않다.
+어노테이션 하나가 추가 되고, 더이상 검증 로직과 비즈니스 로직이 섞이지 않게 되었다.
 
 
-## 5. 스프링 AOP 올바르게 사용하기
+## 5. 하지만
 
-### 5-1. 어드바이스의 범위
+이 방법은 간편하고 코드가 깔끔하다. 하지만 **성능적으로 좋지 않다.**  
+그렇다고 대단히 느려서 사용하면 안되는가? 그건 아니다.  
+실제로 프로덕션에서 사용했을 때 크게 문제가 있을거라 생각하진 않는다.  
 
-아래는 Spring 공식문서에 나오는 내용이다.
-> Around advice is the most general kind of advice. Since Spring AOP, like AspectJ, provides a full range of advice types, we recommend that you use the least powerful advice type that can implement the required behavior.
->>스프링 AOP는 AspectJ와 마찬가지로 모든 범위의 어드바이스 타입을 제공한다. 필요한 동작을 구현하기 위한 최소한의 advice 타입을 사용하는 것을 권장한다.
-
-Around 어드바이스는 범위가 넓다. 최소한의 어드바이스를 사용하는 것이 실수의 여지를 줄인다.  
-`예제에서는 before 어드바이스를 사용하여 target의 메서드가 실행되기 전에 동작하도록 하였다.`
-
----
-
-### 5-2. 포인트컷 설정의 중요성
-
-포인트컷은
-- 1. 어떤 프록시를 생성할지 결정하고
-- 2. 어드바이스가 적용되는 조인포인트(스프링 AOP에서는 조인포인트가 무조건 메서드이다.)를 결정한다.
-
-포인트컷이 중요한 이유는 프록시가 불필요하게 생성되는 것을 방지할 수 있을 뿐더러, 포인트컷이 조인포인트를 결정하는 작업은 매우 비용이 많이 드는 작업이기 때문이다.  
-
-`예제에서는 포인트컷으로 어노테이션을 지정하여 프록시 생성 범위를 제한하였다.`
+하지만 더 나은 방법이 있기에 [다음 글]()에서 소개해보도록 하겠다.
